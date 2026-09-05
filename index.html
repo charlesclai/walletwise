@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💳 Wallet Wise - Credit Card & Benefits Tracker</title>
+    <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -31,6 +33,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white pb-28">
 
+    <!-- Top App Bar -->
     <header class="sticky top-0 z-40 backdrop-blur-md bg-slate-900/80 border-b border-slate-800 px-4 py-3.5">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
@@ -50,8 +53,10 @@
         </div>
     </header>
 
+    <!-- Main Content Container -->
     <main class="w-full max-w-md mx-auto p-4 flex-1">
 
+        <!-- ================= CATEGORIES VIEW ================= -->
         <section id="view-categories" class="space-y-6 animate-float">
             <div class="flex items-center justify-between">
                 <div>
@@ -64,16 +69,20 @@
                 </div>
             </div>
 
+            <!-- Categories Container -->
             <div id="categories-container" class="space-y-5">
-                </div>
+                <!-- Dynamically populated via JS -->
+            </div>
         </section>
 
+        <!-- ================= WALLET VIEW ================= -->
         <section id="view-wallet" class="space-y-6 hidden animate-float">
             <div>
                 <h2 class="text-xl font-bold text-white tracking-tight">Wallet Manager</h2>
                 <p class="text-xs text-slate-400">Select cards to add to your digital wallet</p>
             </div>
 
+            <!-- Add Card Dropdown Card -->
             <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
                 <label for="card-select-dropdown" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Add Card to Wallet</label>
                 <div class="relative">
@@ -90,16 +99,19 @@
                 </button>
             </div>
 
+            <!-- Selected Cards Inventory -->
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cards in Wallet</h3>
                     <span class="text-xs text-indigo-400 font-medium" id="wallet-card-badge">0 active</span>
                 </div>
                 <div id="wallet-cards-list" class="space-y-3">
-                    </div>
+                    <!-- Dynamically populated via JS -->
+                </div>
             </div>
         </section>
 
+        <!-- ================= BENEFITS VIEW ================= -->
         <section id="view-benefits" class="space-y-6 hidden animate-float">
             <div class="flex items-center justify-between">
                 <div>
@@ -107,11 +119,12 @@
                     <p class="text-xs text-slate-400">Track and check off monthly, semi-annual, & annual credits</p>
                 </div>
                 <div class="bg-indigo-500/10 border border-indigo-500/30 px-3 py-1.5 rounded-xl text-right">
-                    <span class="text-[10px] uppercase tracking-wider text-indigo-400 block font-semibold">Claimed</span>
-                    <span class="text-xs font-bold text-white" id="benefit-stats">0/0</span>
+                    <span class="text-[10px] uppercase tracking-wider text-indigo-400 block font-semibold text-center">Claimed</span>
+                    <span class="text-xs font-bold text-white block text-center" id="benefit-stats">0/0</span>
                 </div>
             </div>
 
+            <!-- Frequency Filter Tabs -->
             <div class="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
                 <button onclick="setBenefitFilter('all')" id="filter-btn-all" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition shadow-sm">All</button>
                 <button onclick="setBenefitFilter('Monthly')" id="filter-btn-Monthly" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Monthly</button>
@@ -119,12 +132,15 @@
                 <button onclick="setBenefitFilter('Annual')" id="filter-btn-Annual" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Annual</button>
             </div>
 
+            <!-- Benefits List -->
             <div id="benefits-container" class="space-y-3">
-                </div>
+                <!-- Dynamically populated via JS -->
+            </div>
         </section>
 
     </main>
 
+    <!-- Floating Navigation Bar -->
     <nav class="fixed bottom-4 left-0 right-0 z-50 px-4">
         <div class="max-w-md mx-auto bg-slate-900/90 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl p-1.5 flex items-center justify-around">
             <button onclick="switchView('categories')" id="nav-btn-categories" class="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl transition text-indigo-400 bg-indigo-500/15 font-semibold">
@@ -142,12 +158,13 @@
         </div>
     </nav>
 
+    <!-- JavaScript Application Logic -->
     <script>
-        // Master Dataset of Cards, Multipliers, and Benefits
+        // Master Dataset of Cards, Multipliers, and Benefits (Cleaned official names without symbols, Card/Credit Card)
         const creditCardDatabase = [
             {
                 id: 'amex-plat',
-                name: 'American Express Platinum Card®',
+                name: 'American Express Platinum',
                 issuer: 'American Express',
                 color: 'from-slate-700 via-slate-800 to-zinc-900',
                 multipliers: {
@@ -162,12 +179,12 @@
                     { id: 'ap-1', name: '$200 Annual Airline Fee Statement Credit', freq: 'Annual', desc: 'Resets each calendar year; requires pre-selected airline.' },
                     { id: 'ap-2', name: '$200 Digital Entertainment Credit', freq: 'Monthly', desc: 'Valid for Disney+, Hulu, The New York Times, ESPN+, etc.' },
                     { id: 'ap-3', name: '$50 Saks Fifth Avenue Credit', freq: 'Semi-Annual', desc: 'Semi-annual split ($50 Jan-Jun / $50 Jul-Dec).' },
-                    { id: 'ap-4', name: '$192 CLEAR® Plus Credit', freq: 'Annual', desc: 'Covers annual CLEAR Plus membership.' }
+                    { id: 'ap-4', name: '$192 CLEAR Plus Credit', freq: 'Annual', desc: 'Covers annual CLEAR Plus membership.' }
                 ]
             },
             {
                 id: 'amex-gold',
-                name: 'American Express® Gold Card',
+                name: 'American Express Gold',
                 issuer: 'American Express',
                 color: 'from-amber-600 via-yellow-700 to-amber-900',
                 multipliers: {
@@ -181,13 +198,13 @@
                 benefits: [
                     { id: 'ag-1', name: '$10 Amex Dining Credit (GrubHub partner & participating restaurants)', freq: 'Monthly', desc: 'Valid at participating partners like GrubHub, Shake Shack, Cheesecake Factory.' },
                     { id: 'ag-2', name: '$10 Uber Cash ($15 in Dec)', freq: 'Monthly', desc: 'Get $10 in Uber Cash each month when you add your Gold Card to your Uber account. Use on orders and rides in the U.S. when selecting an Amex Card.' },
-                    { id: 'ag-3', name: '$7 Monthly Dunkin\' Credit', freq: 'Monthly', desc: 'Valid at U.S. Dunkin\' locations.' },
+                    { id: 'ag-3', name: '$7 Monthly Dunkin Credit', freq: 'Monthly', desc: 'Valid at U.S. Dunkin locations.' },
                     { id: 'ag-4', name: '$100 Annual Resy Credit ($50 semi-annually)', freq: 'Semi-Annual', desc: 'Up to $50 semi-annually (Jan-Jun / Jul-Dec) at U.S. Resy restaurants.' }
                 ]
             },
             {
                 id: 'chase-csr',
-                name: 'Chase Sapphire Reserve®',
+                name: 'Chase Sapphire Reserve',
                 issuer: 'Chase',
                 color: 'from-blue-900 via-indigo-950 to-slate-900',
                 multipliers: {
@@ -203,7 +220,7 @@
                     { id: 'csr-2', name: '$100 Experiences Credit', freq: 'Annual', desc: 'Valid for curated Chase experiences and events.' },
                     { id: 'csr-edit', name: '$300 Annual "The Edit" Hotel Credit ($150 semi-annually)', freq: 'Semi-Annual', desc: 'Up to $150 semi-annually (Jan-Jun / Jul-Dec) on The Edit hotel bookings.' },
                     { id: 'csr-dining', name: '$300 Annual OpenTable Exclusive Tables Credit ($150 semi-annually)', freq: 'Semi-Annual', desc: 'Up to $150 semi-annually (Jan-Jun / Jul-Dec) via OpenTable Exclusive Tables.' },
-                    { id: 'csr-stubhub', name: '$120 Annual StubHub Credit ($10 monthly)', freq: 'Monthly', desc: '$10 monthly statement credit for StubHub purchases.' },
+                    { id: 'csr-stubhub', name: '$300 Annual StubHub & viagogo Credit ($150 semi-annually)', freq: 'Semi-Annual', desc: 'Up to $150 semi-annually (Jan 1-Jun 30 / Jul 1-Dec 31) on concert and event tickets purchased on StubHub.com and viagogo.com (activation required).' },
                     { id: 'csr-dd-1', name: '$5 DoorDash Monthly Restaurant Promo Credit', freq: 'Monthly', desc: 'Valid on restaurant orders via DoorDash.' },
                     { id: 'csr-dd-2', name: '$10 DoorDash Non-Restaurant Grocery/Retail Promo Credit (Part 1)', freq: 'Monthly', desc: 'Valid on first grocery/retail non-restaurant order.' },
                     { id: 'csr-dd-3', name: '$10 DoorDash Non-Restaurant Grocery/Retail Promo Credit (Part 2)', freq: 'Monthly', desc: 'Valid on second grocery/retail non-restaurant order.' },
@@ -213,7 +230,7 @@
             },
             {
                 id: 'chase-csp',
-                name: 'Chase Sapphire Preferred® Card',
+                name: 'Chase Sapphire Preferred',
                 issuer: 'Chase',
                 color: 'from-indigo-900 via-blue-900 to-slate-900',
                 multipliers: {
@@ -230,7 +247,7 @@
             },
             {
                 id: 'chase-freedom',
-                name: 'Chase Freedom®',
+                name: 'Chase Freedom',
                 issuer: 'Chase',
                 color: 'from-blue-600 via-blue-800 to-indigo-900',
                 multipliers: {
@@ -245,7 +262,7 @@
             },
             {
                 id: 'chase-freedom-unlimited',
-                name: 'Chase Freedom Unlimited®',
+                name: 'Chase Freedom Unlimited',
                 issuer: 'Chase',
                 color: 'from-blue-700 via-slate-800 to-slate-900',
                 multipliers: {
@@ -260,7 +277,7 @@
             },
             {
                 id: 'chase-marriott',
-                name: 'Marriott Bonvoy Boundless® Credit Card',
+                name: 'Marriott Bonvoy Boundless',
                 issuer: 'Chase',
                 color: 'from-stone-800 via-amber-950 to-stone-900',
                 multipliers: {
@@ -278,7 +295,7 @@
             },
             {
                 id: 'citi-strata',
-                name: 'Citi Strata Premier℠ Card',
+                name: 'Citi Strata Premier',
                 issuer: 'Citi',
                 color: 'from-cyan-900 via-blue-950 to-slate-900',
                 multipliers: {
@@ -295,7 +312,7 @@
             },
             {
                 id: 'citi-double',
-                name: 'Citi Double Cash® Card',
+                name: 'Citi Double Cash',
                 issuer: 'Citi',
                 color: 'from-sky-900 via-slate-900 to-blue-950',
                 multipliers: {
@@ -310,7 +327,7 @@
             },
             {
                 id: 'citi-aa',
-                name: 'Citi® / AAdvantage® Platinum Select® World Elite Mastercard®',
+                name: 'Citi / AAdvantage Platinum Select World Elite Mastercard',
                 issuer: 'Citi',
                 color: 'from-blue-950 via-slate-950 to-zinc-900',
                 multipliers: {
@@ -327,7 +344,7 @@
             },
             {
                 id: 'capital-one-vx',
-                name: 'Capital One Venture X Rewards Credit Card',
+                name: 'Capital One Venture X Rewards',
                 issuer: 'Capital One',
                 color: 'from-slate-800 via-slate-900 to-black',
                 multipliers: {
@@ -345,7 +362,7 @@
             // Additional popular credit cards from TPG top recommended lists
             {
                 id: 'capital-one-venture',
-                name: 'Capital One Venture Rewards Credit Card',
+                name: 'Capital One Venture Rewards',
                 issuer: 'Capital One',
                 color: 'from-blue-900 via-slate-900 to-indigo-950',
                 multipliers: {
@@ -360,7 +377,7 @@
             },
             {
                 id: 'amex-business-gold',
-                name: 'American Express® Business Gold Card',
+                name: 'American Express Business Gold',
                 issuer: 'American Express',
                 color: 'from-amber-700 via-amber-900 to-zinc-900',
                 multipliers: {
@@ -377,7 +394,7 @@
             },
             {
                 id: 'bilt-mastercard',
-                name: 'Bilt Mastercard®',
+                name: 'Bilt Mastercard',
                 issuer: 'Bilt Rewards',
                 color: 'from-zinc-800 via-zinc-900 to-black',
                 multipliers: {
@@ -392,7 +409,7 @@
             },
             {
                 id: 'chase-freedom-flex',
-                name: 'Chase Freedom Flex®',
+                name: 'Chase Freedom Flex',
                 issuer: 'Chase',
                 color: 'from-blue-600 via-indigo-900 to-slate-900',
                 multipliers: {
@@ -407,7 +424,7 @@
             },
             {
                 id: 'amex-blue-cash-preferred',
-                name: 'Blue Cash Preferred® Card from American Express',
+                name: 'Blue Cash Preferred from American Express',
                 issuer: 'American Express',
                 color: 'from-blue-800 via-blue-950 to-slate-900',
                 multipliers: {
@@ -424,7 +441,7 @@
             },
             {
                 id: 'wells-fargo-active-cash',
-                name: 'Wells Fargo Active Cash® Card',
+                name: 'Wells Fargo Active Cash',
                 issuer: 'Wells Fargo',
                 color: 'from-red-950 via-slate-900 to-zinc-900',
                 multipliers: {
@@ -439,7 +456,7 @@
             },
             {
                 id: 'citi-custom-cash',
-                name: 'Citi Custom Cash® Card',
+                name: 'Citi Custom Cash',
                 issuer: 'Citi',
                 color: 'from-blue-900 via-sky-950 to-slate-900',
                 multipliers: {
@@ -454,7 +471,7 @@
             },
             {
                 id: 'capital-one-savor',
-                name: 'Capital One Savor Cash Rewards Credit Card',
+                name: 'Capital One Savor Cash Rewards',
                 issuer: 'Capital One',
                 color: 'from-red-900 via-amber-950 to-black',
                 multipliers: {
@@ -640,7 +657,7 @@
             }).join('');
         }
 
-        // Render Categories View (Highest to Lowest Multiplier with distinct colored badges)
+        // Render Categories View (Grouped by Multiplier Rate, Sorted Highest to Lowest)
         function renderCategoriesView() {
             const container = document.getElementById('categories-container');
             if (userWallet.length === 0) {
@@ -669,10 +686,23 @@
                     }
                 });
 
-                // Sort descending by multiplier value
-                multipliersList.sort((a, b) => b.numericVal - a.numericVal);
-
                 if (multipliersList.length === 0) return '';
+
+                // Group multipliers by rate
+                let rateGroups = {};
+                multipliersList.forEach(item => {
+                    if (!rateGroups[item.rate]) {
+                        rateGroups[item.rate] = {
+                            numericVal: item.numericVal,
+                            rate: item.rate,
+                            cards: []
+                        };
+                    }
+                    rateGroups[item.rate].cards.push(item);
+                });
+
+                // Sort rate groups descending by numericVal
+                let sortedRateGroups = Object.values(rateGroups).sort((a, b) => b.numericVal - a.numericVal);
 
                 return `
                     <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
@@ -682,20 +712,24 @@
                             </div>
                             <h3 class="font-bold text-sm text-white">${cat.name}</h3>
                         </div>
-                        <div class="space-y-2 pt-1">
-                            ${multipliersList.map((item, idx) => {
-                                const badgeStyle = getMultiplierBadgeStyle(item.numericVal);
+                        <div class="space-y-3 pt-1">
+                            ${sortedRateGroups.map(group => {
+                                const badgeStyle = getMultiplierBadgeStyle(group.numericVal);
                                 return `
-                                    <div class="flex items-center justify-between bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
-                                        <div class="flex items-center space-x-3 pr-2">
-                                            <span class="text-xs font-bold text-slate-500 w-4">#${idx + 1}</span>
-                                            <div>
-                                                <span class="text-xs font-bold text-white block">${item.cardName}</span>
-                                                <span class="text-[11px] text-slate-400 block leading-tight">${item.desc}</span>
+                                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 space-y-2">
+                                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-800">
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Multiplier Tier</span>
+                                            <div class="border px-2.5 py-1 rounded-lg text-xs font-extrabold whitespace-nowrap ${badgeStyle}">
+                                                ${group.rate}
                                             </div>
                                         </div>
-                                        <div class="border px-2.5 py-1 rounded-lg text-xs font-extrabold whitespace-nowrap ${badgeStyle}">
-                                            ${item.rate}
+                                        <div class="space-y-2 pt-0.5">
+                                            ${group.cards.map(item => `
+                                                <div>
+                                                    <span class="text-xs font-bold text-white block">${item.cardName}</span>
+                                                    <span class="text-[11px] text-slate-400 block leading-tight">${item.desc}</span>
+                                                </div>
+                                            `).join('')}
                                         </div>
                                     </div>
                                 `;
@@ -802,7 +836,7 @@
                         </div>
                         <div class="flex-1 space-y-1">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${b.freq === 'Monthly' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : b.freq === 'Semi-Annual' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'}">${b.freq} Reset</span>
+                                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full text-center block ${b.freq === 'Monthly' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : b.freq === 'Semi-Annual' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'}">${b.freq} Reset</span>
                                 <span class="text-xs font-bold text-slate-400">${b.cardName}</span>
                             </div>
                             <h4 class="font-bold text-sm ${isChecked ? 'line-through text-slate-400' : 'text-white'}">${b.name}</h4>
