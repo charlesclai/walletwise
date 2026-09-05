@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WalletWise - Credit Card & Benefits Tracker</title>
-    <!-- Tailwind CSS Play CDN -->
+    <title>💳 Wallet Wise - Credit Card & Benefits Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -33,7 +31,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white pb-28">
 
-    <!-- Top App Bar -->
     <header class="sticky top-0 z-40 backdrop-blur-md bg-slate-900/80 border-b border-slate-800 px-4 py-3.5">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
@@ -42,7 +39,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-base tracking-tight text-white flex items-center gap-1.5">
-                        WalletWise
+                        💳 Wallet Wise
                     </h1>
                     <p class="text-xs text-slate-400" id="wallet-summary-subtitle">Loading wallet...</p>
                 </div>
@@ -53,10 +50,8 @@
         </div>
     </header>
 
-    <!-- Main Content Container -->
     <main class="w-full max-w-md mx-auto p-4 flex-1">
 
-        <!-- ================= CATEGORIES VIEW ================= -->
         <section id="view-categories" class="space-y-6 animate-float">
             <div class="flex items-center justify-between">
                 <div>
@@ -69,20 +64,16 @@
                 </div>
             </div>
 
-            <!-- Categories Container -->
             <div id="categories-container" class="space-y-5">
-                <!-- Dynamically populated via JS -->
-            </div>
+                </div>
         </section>
 
-        <!-- ================= WALLET VIEW ================= -->
         <section id="view-wallet" class="space-y-6 hidden animate-float">
             <div>
                 <h2 class="text-xl font-bold text-white tracking-tight">Wallet Manager</h2>
                 <p class="text-xs text-slate-400">Select cards to add to your digital wallet</p>
             </div>
 
-            <!-- Add Card Dropdown Card -->
             <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
                 <label for="card-select-dropdown" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Add Card to Wallet</label>
                 <div class="relative">
@@ -99,24 +90,21 @@
                 </button>
             </div>
 
-            <!-- Selected Cards Inventory -->
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cards in Wallet</h3>
                     <span class="text-xs text-indigo-400 font-medium" id="wallet-card-badge">0 active</span>
                 </div>
                 <div id="wallet-cards-list" class="space-y-3">
-                    <!-- Dynamically populated via JS -->
-                </div>
+                    </div>
             </div>
         </section>
 
-        <!-- ================= BENEFITS VIEW ================= -->
         <section id="view-benefits" class="space-y-6 hidden animate-float">
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-xl font-bold text-white tracking-tight">Active Benefits</h2>
-                    <p class="text-xs text-slate-400">Track and check off monthly, quarterly, & annual credits</p>
+                    <p class="text-xs text-slate-400">Track and check off monthly, semi-annual, & annual credits</p>
                 </div>
                 <div class="bg-indigo-500/10 border border-indigo-500/30 px-3 py-1.5 rounded-xl text-right">
                     <span class="text-[10px] uppercase tracking-wider text-indigo-400 block font-semibold">Claimed</span>
@@ -124,23 +112,19 @@
                 </div>
             </div>
 
-            <!-- Frequency Filter Tabs -->
             <div class="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
                 <button onclick="setBenefitFilter('all')" id="filter-btn-all" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition shadow-sm">All</button>
                 <button onclick="setBenefitFilter('Monthly')" id="filter-btn-Monthly" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Monthly</button>
-                <button onclick="setBenefitFilter('Quarterly')" id="filter-btn-Quarterly" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Quarterly</button>
+                <button onclick="setBenefitFilter('Semi-Annual')" id="filter-btn-Semi-Annual" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Semi-Annual</button>
                 <button onclick="setBenefitFilter('Annual')" id="filter-btn-Annual" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Annual</button>
             </div>
 
-            <!-- Benefits List -->
             <div id="benefits-container" class="space-y-3">
-                <!-- Dynamically populated via JS -->
-            </div>
+                </div>
         </section>
 
     </main>
 
-    <!-- Floating Navigation Bar -->
     <nav class="fixed bottom-4 left-0 right-0 z-50 px-4">
         <div class="max-w-md mx-auto bg-slate-900/90 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl p-1.5 flex items-center justify-around">
             <button onclick="switchView('categories')" id="nav-btn-categories" class="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl transition text-indigo-400 bg-indigo-500/15 font-semibold">
@@ -158,7 +142,6 @@
         </div>
     </nav>
 
-    <!-- JavaScript Application Logic -->
     <script>
         // Master Dataset of Cards, Multipliers, and Benefits
         const creditCardDatabase = [
@@ -178,7 +161,7 @@
                 benefits: [
                     { id: 'ap-1', name: '$200 Annual Airline Fee Statement Credit', freq: 'Annual', desc: 'Resets each calendar year; requires pre-selected airline.' },
                     { id: 'ap-2', name: '$200 Digital Entertainment Credit', freq: 'Monthly', desc: 'Valid for Disney+, Hulu, The New York Times, ESPN+, etc.' },
-                    { id: 'ap-3', name: '$50 Saks Fifth Avenue Credit', freq: 'Quarterly', desc: 'Semi-annual split ($50 Jan-Jun / $50 Jul-Dec).' },
+                    { id: 'ap-3', name: '$50 Saks Fifth Avenue Credit', freq: 'Semi-Annual', desc: 'Semi-annual split ($50 Jan-Jun / $50 Jul-Dec).' },
                     { id: 'ap-4', name: '$192 CLEAR® Plus Credit', freq: 'Annual', desc: 'Covers annual CLEAR Plus membership.' }
                 ]
             },
@@ -196,10 +179,10 @@
                     misc: { rate: '1x', desc: 'Membership Rewards Points on all other purchases' }
                 },
                 benefits: [
-                    { id: 'ag-1', name: '$10 Amex Dining Credit', freq: 'Monthly', desc: 'Valid at participating partners like Shake Shack, Cheesecake Factory.' },
-                    { id: 'ag-2', name: '$15 Uber Cash ($20 in Dec)', freq: 'Monthly', desc: 'Valid for rides or Uber Eats orders in the U.S.' },
+                    { id: 'ag-1', name: '$10 Amex Dining Credit (GrubHub partner & participating restaurants)', freq: 'Monthly', desc: 'Valid at participating partners like GrubHub, Shake Shack, Cheesecake Factory.' },
+                    { id: 'ag-2', name: '$10 Uber Cash ($15 in Dec)', freq: 'Monthly', desc: 'Get $10 in Uber Cash each month when you add your Gold Card to your Uber account. Use on orders and rides in the U.S. when selecting an Amex Card.' },
                     { id: 'ag-3', name: '$7 Monthly Dunkin\' Credit', freq: 'Monthly', desc: 'Valid at U.S. Dunkin\' locations.' },
-                    { id: 'ag-4', name: '$100 Annual Resy Credit ($50 semi-annually)', freq: 'Quarterly', desc: 'Up to $50 semi-annually (Jan-Jun / Jul-Dec) at U.S. Resy restaurants.' }
+                    { id: 'ag-4', name: '$100 Annual Resy Credit ($50 semi-annually)', freq: 'Semi-Annual', desc: 'Up to $50 semi-annually (Jan-Jun / Jul-Dec) at U.S. Resy restaurants.' }
                 ]
             },
             {
@@ -218,8 +201,8 @@
                 benefits: [
                     { id: 'csr-1', name: '$300 Annual Travel Credit', freq: 'Annual', desc: 'Automatically applies to broad travel purchases.' },
                     { id: 'csr-2', name: '$100 Experiences Credit', freq: 'Annual', desc: 'Valid for curated Chase experiences and events.' },
-                    { id: 'csr-edit', name: '$300 Annual "The Edit" Hotel Credit ($150 semi-annually)', freq: 'Quarterly', desc: 'Up to $150 semi-annually (Jan-Jun / Jul-Dec) on The Edit hotel bookings.' },
-                    { id: 'csr-dining', name: '$300 Annual OpenTable Exclusive Tables Credit ($150 semi-annually)', freq: 'Quarterly', desc: 'Up to $150 semi-annually (Jan-Jun / Jul-Dec) via OpenTable Exclusive Tables.' },
+                    { id: 'csr-edit', name: '$300 Annual "The Edit" Hotel Credit ($150 semi-annually)', freq: 'Semi-Annual', desc: 'Up to $150 semi-annually (Jan-Jun / Jul-Dec) on The Edit hotel bookings.' },
+                    { id: 'csr-dining', name: '$300 Annual OpenTable Exclusive Tables Credit ($150 semi-annually)', freq: 'Semi-Annual', desc: 'Up to $150 semi-annually (Jan-Jun / Jul-Dec) via OpenTable Exclusive Tables.' },
                     { id: 'csr-stubhub', name: '$120 Annual StubHub Credit ($10 monthly)', freq: 'Monthly', desc: '$10 monthly statement credit for StubHub purchases.' },
                     { id: 'csr-dd-1', name: '$5 DoorDash Monthly Restaurant Promo Credit', freq: 'Monthly', desc: 'Valid on restaurant orders via DoorDash.' },
                     { id: 'csr-dd-2', name: '$10 DoorDash Non-Restaurant Grocery/Retail Promo Credit (Part 1)', freq: 'Monthly', desc: 'Valid on first grocery/retail non-restaurant order.' },
@@ -290,7 +273,7 @@
                 },
                 benefits: [
                     { id: 'mb-1', name: 'Annual Free Night Award (up to 35k points)', freq: 'Annual', desc: 'Issued each year upon account anniversary.' },
-                    { id: 'mb-air', name: '$100 Annual Airline Statement Credit ($50 semi-annually)', freq: 'Quarterly', desc: 'Up to $50 statement credit each half of the year on airline purchases.' }
+                    { id: 'mb-air', name: '$100 Annual Airline Statement Credit ($50 semi-annually)', freq: 'Semi-Annual', desc: 'Up to $50 statement credit each half of the year on airline purchases.' }
                 ]
             },
             {
@@ -726,7 +709,7 @@
         // Render Benefits View
         function setBenefitFilter(freq) {
             currentBenefitFilter = freq;
-            ['all', 'Monthly', 'Quarterly', 'Annual'].forEach(f => {
+            ['all', 'Monthly', 'Semi-Annual', 'Annual'].forEach(f => {
                 const btn = document.getElementById(`filter-btn-${f}`);
                 if (f === freq) {
                     btn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition shadow-sm";
@@ -819,7 +802,7 @@
                         </div>
                         <div class="flex-1 space-y-1">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${b.freq === 'Monthly' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : b.freq === 'Quarterly' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'}">${b.freq} Reset</span>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${b.freq === 'Monthly' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : b.freq === 'Semi-Annual' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'}">${b.freq} Reset</span>
                                 <span class="text-xs font-bold text-slate-400">${b.cardName}</span>
                             </div>
                             <h4 class="font-bold text-sm ${isChecked ? 'line-through text-slate-400' : 'text-white'}">${b.name}</h4>
