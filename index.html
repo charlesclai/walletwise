@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalletWise - Credit Card & Benefits Tracker</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-float {
+            animation: floatIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white pb-28">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-slate-900/80 border-b border-slate-800 px-4 py-3.5">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-gradient-to-br from-indigo-500 to-violet-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <i data-lucide="credit-card" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight text-white flex items-center gap-1.5">
+                        WalletWise
+                    </h1>
+                    <p class="text-xs text-slate-400" id="wallet-summary-subtitle">Loading wallet...</p>
+                </div>
+            </div>
+            <button onclick="resetAllBenefits()" title="Reset Benefits" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700/60 active:scale-95">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-md mx-auto p-4 flex-1">
+
+        <!-- ================= CATEGORIES VIEW ================= -->
+        <section id="view-categories" class="space-y-6 animate-float">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-tight">Reward Multipliers</h2>
+                    <p class="text-xs text-slate-400">Ranked highest to lowest based on your active wallet cards</p>
+                </div>
+                <div class="bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/60 flex items-center gap-1.5">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
+                    <span class="text-xs font-semibold text-slate-200" id="active-card-count">0 cards</span>
+                </div>
+            </div>
+
+            <!-- Categories Container -->
+            <div id="categories-container" class="space-y-5">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- ================= WALLET VIEW ================= -->
+        <section id="view-wallet" class="space-y-6 hidden animate-float">
+            <div>
+                <h2 class="text-xl font-bold text-white tracking-tight">Wallet Manager</h2>
+                <p class="text-xs text-slate-400">Select cards to add to your digital wallet</p>
+            </div>
+
+            <!-- Add Card Dropdown Card -->
+            <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+                <label for="card-select-dropdown" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Add Card to Wallet</label>
+                <div class="relative">
+                    <select id="card-select-dropdown" class="w-full appearance-none bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition cursor-pointer pr-10">
+                        <option value="" disabled selected>Select a credit card...</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <button onclick="addSelectedCard()" class="w-full bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-500/25 transition active:scale-[0.99] flex items-center justify-center gap-2 text-sm">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    Add to Wallet
+                </button>
+            </div>
+
+            <!-- Selected Cards Inventory -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cards in Wallet</h3>
+                    <span class="text-xs text-indigo-400 font-medium" id="wallet-card-badge">0 active</span>
+                </div>
+                <div id="wallet-cards-list" class="space-y-3">
+                    <!-- Dynamically populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= BENEFITS VIEW ================= -->
+        <section id="view-benefits" class="space-y-6 hidden animate-float">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-tight">Active Benefits</h2>
+                    <p class="text-xs text-slate-400">Track and check off monthly, quarterly, & annual credits</p>
+                </div>
+                <div class="bg-indigo-500/10 border border-indigo-500/30 px-3 py-1.5 rounded-xl text-right">
+                    <span class="text-[10px] uppercase tracking-wider text-indigo-400 block font-semibold">Claimed</span>
+                    <span class="text-xs font-bold text-white" id="benefit-stats">0/0</span>
+                </div>
+            </div>
+
+            <!-- Frequency Filter Tabs -->
+            <div class="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
+                <button onclick="setBenefitFilter('all')" id="filter-btn-all" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition shadow-sm">All</button>
+                <button onclick="setBenefitFilter('Monthly')" id="filter-btn-Monthly" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Monthly</button>
+                <button onclick="setBenefitFilter('Quarterly')" id="filter-btn-Quarterly" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Quarterly</button>
+                <button onclick="setBenefitFilter('Annual')" id="filter-btn-Annual" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition">Annual</button>
+            </div>
+
+            <!-- Benefits List -->
+            <div id="benefits-container" class="space-y-3">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Navigation Bar -->
+    <nav class="fixed bottom-4 left-0 right-0 z-50 px-4">
+        <div class="max-w-md mx-auto bg-slate-900/90 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl p-1.5 flex items-center justify-around">
+            <button onclick="switchView('categories')" id="nav-btn-categories" class="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl transition text-indigo-400 bg-indigo-500/15 font-semibold">
+                <i data-lucide="grid" class="w-5 h-5 mb-1"></i>
+                <span class="text-[11px] tracking-tight">Categories</span>
+            </button>
+            <button onclick="switchView('wallet')" id="nav-btn-wallet" class="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl transition text-slate-400 hover:text-slate-200 font-medium">
+                <i data-lucide="wallet" class="w-5 h-5 mb-1"></i>
+                <span class="text-[11px] tracking-tight">Wallet</span>
+            </button>
+            <button onclick="switchView('benefits')" id="nav-btn-benefits" class="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl transition text-slate-400 hover:text-slate-200 font-medium">
+                <i data-lucide="gift" class="w-5 h-5 mb-1"></i>
+                <span class="text-[11px] tracking-tight">Benefits</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Master Dataset of Cards, Multipliers, and Benefits
+        const creditCardDatabase = [
+            {
+                id: 'amex-plat',
+                name: 'American Express Platinum Card®',
+                issuer: 'American Express',
+                color: 'from-slate-700 via-slate-800 to-zinc-900',
+                multipliers: {
+                    flights: { rate: '5x', desc: 'Membership Rewards Points on flights booked directly or via Amex Travel (up to $500k/yr)' },
+                    hotels: { rate: '1x', desc: 'Base rate on hotels' },
+                    dining: { rate: '1x', desc: 'Base rate on restaurants' },
+                    groceries: { rate: '1x', desc: 'Base rate on supermarkets' },
+                    gas: { rate: '1x', desc: 'Base rate at gas stations' },
+                    misc: { rate: '1x', desc: 'Membership Rewards Points on all other purchases' }
+                },
+                benefits: [
+                    { id: 'ap-1', name: '$200 Annual Airline Fee Statement Credit', freq: 'Annual', desc: 'Resets each calendar year; requires pre-selected airline.' },
+                    { id: 'ap-2', name: '$200 Digital Entertainment Credit', freq: 'Monthly', desc: 'Valid for Disney+, Hulu, The New York Times, ESPN+, etc.' },
+                    { id: 'ap-3', name: '$50 Saks Fifth Avenue Credit', freq: 'Quarterly', desc: 'Semi-annual split ($50 Jan-Jun / $50 Jul-Dec).' },
+                    { id: 'ap-4', name: '$192 CLEAR® Plus Credit', freq: 'Annual', desc: 'Covers annual CLEAR Plus membership.' }
+                ]
+            },
+            {
+                id: 'amex-gold',
+                name: 'American Express® Gold Card',
+                issuer: 'American Express',
+                color: 'from-amber-600 via-yellow-700 to-amber-900',
+                multipliers: {
+                    dining: { rate: '4x', desc: 'Membership Rewards Points on restaurants worldwide (up to $50k/yr)' },
+                    groceries: { rate: '4x', desc: 'Membership Rewards Points at U.S. supermarkets (up to $25k/yr)' },
+                    flights: { rate: '3x', desc: 'Membership Rewards Points on flights booked directly or via Amex Travel' },
+                    hotels: { rate: '1x', desc: 'Base rate on hotels' },
+                    gas: { rate: '1x', desc: 'Base rate at gas stations' },
+                    misc: { rate: '1x', desc: 'Membership Rewards Points on all other purchases' }
+                },
+                benefits: [
+                    { id: 'ag-1', name: '$10 Amex Dining Credit', freq: 'Monthly', desc: 'Valid at participating partners like Shake Shack, Cheesecake Factory.' },
+                    { id: 'ag-2', name: '$15 Uber Cash ($20 in Dec)', freq: 'Monthly', desc: 'Valid for rides or Uber Eats orders in the U.S.' }
+                ]
+            },
+            {
+                id: 'chase-csr',
+                name: 'Chase Sapphire Reserve®',
+                issuer: 'Chase',
+                color: 'from-blue-900 via-indigo-950 to-slate-900',
+                multipliers: {
+                    hotels: { rate: '10x', desc: 'Total Points on hotels & car rentals through Chase Travel' },
+                    flights: { rate: '5x', desc: 'Total Points on flights through Chase Travel' },
+                    dining: { rate: '3x', desc: 'Ultimate Rewards Points on worldwide dining' },
+                    groceries: { rate: '1x', desc: 'Base rate on supermarkets' },
+                    gas: { rate: '1x', desc: 'Base rate at gas stations' },
+                    misc: { rate: '1x', desc: 'Ultimate Rewards Points on all other purchases' }
+                },
+                benefits: [
+                    { id: 'csr-1', name: '$300 Annual Travel Credit', freq: 'Annual', desc: 'Automatically applies to broad travel purchases.' },
+                    { id: 'csr-2', name: '$100 Experiences Credit', freq: 'Annual', desc: 'Valid for curated Chase experiences and events.' },
+                    { id: 'csr-dd-1', name: '$5 DoorDash Monthly Restaurant Promo Credit', freq: 'Monthly', desc: 'Valid on restaurant orders via DoorDash.' },
+                    { id: 'csr-dd-2', name: '$10 DoorDash Non-Restaurant Grocery/Retail Promo Credit (Part 1)', freq: 'Monthly', desc: 'Valid on first grocery/retail non-restaurant order.' },
+                    { id: 'csr-dd-3', name: '$10 DoorDash Non-Restaurant Grocery/Retail Promo Credit (Part 2)', freq: 'Monthly', desc: 'Valid on second grocery/retail non-restaurant order.' },
+                    { id: 'csr-peloton', name: '$10 Monthly Peloton Membership Statement Credit', freq: 'Monthly', desc: 'Statement credit on eligible Peloton memberships.' },
+                    { id: 'csr-lyft', name: '$10 Monthly Lyft In-App Ride Credit', freq: 'Monthly', desc: 'Credit to use on Lyft rides.' }
+                ]
+            },
+            {
+                id: 'chase-csp',
+                name: 'Chase Sapphire Preferred® Card',
+                issuer: 'Chase',
+                color: 'from-indigo-900 via-blue-900 to-slate-900',
+                multipliers: {
+                    hotels: { rate: '5x', desc: 'Points on travel & hotels through Chase Travel; 2x on general travel' },
+                    flights: { rate: '5x', desc: 'Points on flights through Chase Travel; 2x on general travel' },
+                    dining: { rate: '3x', desc: 'Ultimate Rewards Points on dining, delivery services, and takeout' },
+                    groceries: { rate: '3x', desc: 'Ultimate Rewards Points on online grocery purchases (excl. target/walmart)' },
+                    gas: { rate: '1x', desc: 'Base rate at gas stations' },
+                    misc: { rate: '1x', desc: 'Ultimate Rewards Points on all other purchases' }
+                },
+                benefits: [
+                    { id: 'csp-1', name: '$50 Annual Hotel Credit', freq: 'Annual', desc: 'Statement credit for hotel stays booked through Chase Travel.' }
+                ]
+            },
+            {
+                id: 'chase-freedom',
+                name: 'Chase Freedom®',
+                issuer: 'Chase',
+                color: 'from-blue-600 via-blue-800 to-indigo-900',
+                multipliers: {
+                    gas: { rate: '5x', desc: 'Cash Back on Q3 rotating categories (Gas Stations, EV Charging, Public Transit, Live Entertainment)' },
+                    dining: { rate: '1x', desc: 'Base rate on dining' },
+                    groceries: { rate: '1x', desc: 'Base rate on supermarkets' },
+                    flights: { rate: '1x', desc: 'Base rate on flights' },
+                    hotels: { rate: '1x', desc: 'Base rate on hotels' },
+                    misc: { rate: '1x', desc: 'Cash Back on all other purchases' }
+                },
+                benefits: []
+            },
+            {
+                id: 'chase-freedom-unlimited',
+                name: 'Chase Freedom Unlimited®',
+                issuer: 'Chase',
+                color: 'from-blue-700 via-slate-800 to-slate-900',
+                multipliers: {
+                    flights: { rate: '5x', desc: 'Cash Back on travel purchased through Chase Travel' },
+                    hotels: { rate: '5x', desc: 'Cash Back on travel purchased through Chase Travel' },
+                    dining: { rate: '3x', desc: 'Cash Back on dining at restaurants' },
+                    groceries: { rate: '1.5x', desc: 'Base rate on grocery stores' },
+                    gas: { rate: '1.5x', desc: 'Base rate at gas stations' },
+                    misc: { rate: '1.5x', desc: 'Cash Back on all other general purchases' }
+                },
+                benefits: []
+            },
+            {
+                id: 'chase-marriott',
+                name: 'Marriott Bonvoy Boundless® Credit Card',
+                issuer: 'Chase',
+                color: 'from-stone-800 via-amber-950 to-stone-900',
+                multipliers: {
+                    hotels: { rate: '6x', desc: 'Bonvoy points per dollar at participating Marriott properties' },
+                    dining: { rate: '2x', desc: 'Bonvoy points on dining at restaurants' },
+                    groceries: { rate: '2x', desc: 'Bonvoy points at U.S. supermarkets' },
+                    gas: { rate: '2x', desc: 'Bonvoy points at gas stations' },
+                    flights: { rate: '2x', desc: 'Bonvoy points on travel' },
+                    misc: { rate: '2x', desc: 'Bonvoy points on all other everyday purchases' }
+                },
+                benefits: [
+                    { id: 'mb-1', name: 'Annual Free Night Award (up to 35k points)', freq: 'Annual', desc: 'Issued each year upon account anniversary.' }
+                ]
+            },
+            {
+                id: 'citi-strata',
+                name: 'Citi Strata Premier℠ Card',
+                issuer: 'Citi',
+                color: 'from-cyan-900 via-blue-950 to-slate-900',
+                multipliers: {
+                    hotels: { rate: '10x', desc: 'Points on hotels, car rentals, and attractions via Citi Travel; 3x hotels' },
+                    flights: { rate: '3x', desc: 'ThankYou Points on air travel' },
+                    dining: { rate: '3x', desc: 'ThankYou Points on restaurants and food delivery' },
+                    groceries: { rate: '3x', desc: 'ThankYou Points at supermarkets' },
+                    gas: { rate: '3x', desc: 'ThankYou Points at gas stations and EV charging' },
+                    misc: { rate: '1x', desc: 'ThankYou Points on all other purchases' }
+                },
+                benefits: [
+                    { id: 'cs-1', name: '$100 Annual Hotel Benefit ($500+ stay minimum)', freq: 'Annual', desc: 'Resets each calendar year via Citi Travel.' }
+                ]
+            },
+            {
+                id: 'citi-double',
+                name: 'Citi Double Cash® Card',
+                issuer: 'Citi',
+                color: 'from-sky-900 via-slate-900 to-blue-950',
+                multipliers: {
+                    misc: { rate: '2x', desc: 'ThankYou Points (1x when you buy, 1x as you pay)' },
+                    dining: { rate: '2x', desc: 'ThankYou Points (1x buy + 1x pay structure)' },
+                    groceries: { rate: '2x', desc: 'ThankYou Points (1x buy + 1x pay structure)' },
+                    gas: { rate: '2x', desc: 'ThankYou Points (1x buy + 1x pay structure)' },
+                    flights: { rate: '2x', desc: 'ThankYou Points (1x buy + 1x pay structure)' },
+                    hotels: { rate: '2x', desc: 'ThankYou Points (1x buy + 1x pay structure)' }
+                },
+                benefits: []
+            },
+            {
+                id: 'citi-aa',
+                name: 'Citi® / AAdvantage® Platinum Select® World Elite Mastercard®',
+                issuer: 'Citi',
+                color: 'from-blue-950 via-slate-950 to-zinc-900',
+                multipliers: {
+                    flights: { rate: '2x', desc: 'AAdvantage miles on American Airlines flights' },
+                    hotels: { rate: '2x', desc: 'AAdvantage miles on hotel purchases' },
+                    dining: { rate: '2x', desc: 'AAdvantage miles at restaurants' },
+                    groceries: { rate: '2x', desc: 'AAdvantage miles at gas stations and select grocery stores' },
+                    gas: { rate: '2x', desc: 'AAdvantage miles at gas stations' },
+                    misc: { rate: '1x', desc: 'AAdvantage miles on general purchases' }
+                },
+                benefits: [
+                    { id: 'aa-1', name: '$125 American Airlines Flight Discount', freq: 'Annual', desc: 'Issued after spending $20,000+ in a membership year.' }
+                ]
+            },
+            {
+                id: 'capital-one-vx',
+                name: 'Capital One Venture X Rewards Credit Card',
+                issuer: 'Capital One',
+                color: 'from-slate-800 via-slate-900 to-black',
+                multipliers: {
+                    hotels: { rate: '10x', desc: 'Miles on hotels/car rentals via Capital One Travel' },
+                    flights: { rate: '5x', desc: 'Miles on flights via Capital One Travel' },
+                    misc: { rate: '2x', desc: 'Miles per dollar on all other purchases' },
+                    dining: { rate: '2x', desc: 'Miles per dollar on dining' },
+                    groceries: { rate: '2x', desc: 'Miles per dollar on supermarkets' },
+                    gas: { rate: '2x', desc: 'Miles per dollar at gas stations' }
+                },
+                benefits: [
+                    { id: 'vx-1', name: '$300 Annual Capital One Travel Credit', freq: 'Annual', desc: 'Resets each cardmember year via Capital One Travel portal.' },
+                    { id: 'vx-2', name: '10,000 Anniversary Bonus Miles', freq: 'Annual', desc: 'Awarded every account anniversary year.' }
+                ]
+            },
+            // Expanded popular credit card additions (TPG top recommended lists)
+            {
+                id: 'capital-one-venture',
+                name: 'Capital One Venture Rewards Credit Card',
+                issuer: 'Capital One',
+                color: 'from-blue-900 via-slate-900 to-indigo-950',
+                multipliers: {
+                    hotels: { rate: '5x', desc: 'Miles on hotels/car rentals via Capital One Travel' },
+                    flights: { rate: '5x', desc: 'Miles on flights via Capital One Travel' },
+                    misc: { rate: '2x', desc: 'Miles per dollar on everyday purchases' },
+                    dining: { rate: '2x', desc: 'Base rate on dining' },
+                    groceries: { rate: '2x', desc: 'Base rate on groceries' },
+                    gas: { rate: '2x', desc: 'Base rate on gas' }
+                },
+                benefits: []
+            },
+            {
+                id: 'amex-business-gold',
+                name: 'American Express® Business Gold Card',
+                issuer: 'American Express',
+                color: 'from-amber-700 via-amber-900 to-zinc-900',
+                multipliers: {
+                    dining: { rate: '4x', desc: 'Membership Rewards points on top 2 eligible categories each billing cycle' },
+                    groceries: { rate: '4x', desc: 'Membership Rewards points on select business categories' },
+                    flights: { rate: '3x', desc: 'Booked via Amex Travel' },
+                    hotels: { rate: '1x', desc: 'Base rate' },
+                    gas: { rate: '1x', desc: 'Base rate' },
+                    misc: { rate: '1x', desc: 'Base rate' }
+                },
+                benefits: [
+                    { id: 'abg-1', name: '$240 Annual Walmart+ Statement Credit', freq: 'Monthly', desc: '$20 monthly credit for Walmart+ membership.' }
+                ]
+            },
+            {
+                id: 'bilt-mastercard',
+                name: 'Bilt Mastercard®',
+                issuer: 'Bilt Rewards',
+                color: 'from-zinc-800 via-zinc-900 to-black',
+                multipliers: {
+                    dining: { rate: '3x', desc: 'Bilt Points on dining' },
+                    flights: { rate: '2x', desc: 'Bilt Points on travel' },
+                    hotels: { rate: '2x', desc: 'Bilt Points on travel' },
+                    misc: { rate: '1x', desc: 'Bilt Points on rent (up to 100k/yr) and general spend' },
+                    groceries: { rate: '1x', desc: 'Base rate' },
+                    gas: { rate: '1x', desc: 'Base rate' }
+                },
+                benefits: []
+            },
+            {
+                id: 'chase-freedom-flex',
+                name: 'Chase Freedom Flex®',
+                issuer: 'Chase',
+                color: 'from-blue-600 via-indigo-900 to-slate-900',
+                multipliers: {
+                    gas: { rate: '5x', desc: 'Cash Back on quarterly rotating categories' },
+                    dining: { rate: '3x', desc: 'Cash Back on dining at restaurants' },
+                    flights: { rate: '5x', desc: 'Cash Back on Chase Travel' },
+                    hotels: { rate: '5x', desc: 'Cash Back on Chase Travel' },
+                    groceries: { rate: '1x', desc: 'Base rate' },
+                    misc: { rate: '1x', desc: 'Cash Back on general spend' }
+                },
+                benefits: []
+            },
+            {
+                id: 'amex-blue-cash-preferred',
+                name: 'Blue Cash Preferred® Card from American Express',
+                issuer: 'American Express',
+                color: 'from-blue-800 via-blue-950 to-slate-900',
+                multipliers: {
+                    groceries: { rate: '6x', desc: 'Cash Back on U.S. supermarkets (up to $6,000 per year, then 1x)' },
+                    gas: { rate: '3x', desc: 'Cash Back on U.S. gas stations and transit' },
+                    hotels: { rate: '1x', desc: 'Base rate' },
+                    flights: { rate: '1x', desc: 'Base rate' },
+                    dining: { rate: '1x', desc: 'Base rate' },
+                    misc: { rate: '1x', desc: 'Cash Back on other purchases' }
+                },
+                benefits: [
+                    { id: 'bcp-1', name: '$84 Annual Disney Bundle Credit', freq: 'Monthly', desc: '$7 monthly statement credit for eligible streaming subscriptions.' }
+                ]
+            },
+            {
+                id: 'wells-fargo-active-cash',
+                name: 'Wells Fargo Active Cash® Card',
+                issuer: 'Wells Fargo',
+                color: 'from-red-950 via-slate-900 to-zinc-900',
+                multipliers: {
+                    misc: { rate: '2%', desc: 'Cash rewards on all purchases' },
+                    dining: { rate: '2%', desc: 'Cash rewards' },
+                    groceries: { rate: '2%', desc: 'Cash rewards' },
+                    gas: { rate: '2%', desc: 'Cash rewards' },
+                    flights: { rate: '2%', desc: 'Cash rewards' },
+                    hotels: { rate: '2%', desc: 'Cash rewards' }
+                },
+                benefits: []
+            },
+            {
+                id: 'citi-custom-cash',
+                name: 'Citi Custom Cash® Card',
+                issuer: 'Citi',
+                color: 'from-blue-900 via-sky-950 to-slate-900',
+                multipliers: {
+                    groceries: { rate: '5x', desc: 'ThankYou Points on your highest eligible spend category each billing cycle (up to $500)' },
+                    dining: { rate: '5x', desc: 'Eligible top category' },
+                    gas: { rate: '5x', desc: 'Eligible top category' },
+                    flights: { rate: '1x', desc: 'Base rate' },
+                    hotels: { rate: '1x', desc: 'Base rate' },
+                    misc: { rate: '1x', desc: 'Base rate' }
+                },
+                benefits: []
+            },
+            {
+                id: 'capital-one-savor',
+                name: 'Capital One Savor Cash Rewards Credit Card',
+                issuer: 'Capital One',
+                color: 'from-red-900 via-amber-950 to-black',
+                multipliers: {
+                    dining: { rate: '3x', desc: 'Cash back on dining, entertainment, popular streaming services, and grocery stores' },
+                    groceries: { rate: '3x', desc: 'Cash back on grocery stores' },
+                    gas: { rate: '1x', desc: 'Base rate' },
+                    flights: { rate: '1x', desc: 'Base rate' },
+                    hotels: { rate: '1x', desc: 'Base rate' },
+                    misc: { rate: '1x', desc: 'Cash back on all other purchases' }
+                },
+                benefits: []
+            }
+        ];
+
+        // Standardized Categories definition
+        const categoryConfig = [
+            { key: 'dining', name: 'Dining and Restaurants', icon: 'utensils' },
+            { key: 'groceries', name: 'Groceries and Supermarkets', icon: 'shopping-cart' },
+            { key: 'gas', name: 'Gas Stations', icon: 'fuel' },
+            { key: 'flights', name: 'Flights', icon: 'plane' },
+            { key: 'hotels', name: 'Hotels', icon: 'building-2' },
+            { key: 'misc', name: 'Miscellaneous', icon: 'layers' }
+        ];
+
+        // State Management
+        let userWallet = ['amex-plat', 'amex-gold', 'chase-csr', 'capital-one-vx'];
+        let checkedBenefits = {};
+        let currentBenefitFilter = 'all';
+        let currentActiveView = 'categories';
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            populateDropdown();
+            renderAll();
+            lucide.createIcons();
+        });
+
+        function loadState() {
+            const savedWallet = localStorage.getItem('walletwise_wallet');
+            const savedBenefits = localStorage.getItem('walletwise_benefits');
+            if (savedWallet) {
+                try { userWallet = JSON.parse(savedWallet); } catch(e) {}
+            }
+            if (savedBenefits) {
+                try { checkedBenefits = JSON.parse(savedBenefits); } catch(e) {}
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('walletwise_wallet', JSON.stringify(userWallet));
+            localStorage.setItem('walletwise_benefits', JSON.stringify(checkedBenefits));
+        }
+
+        // Navigation Switcher
+        function switchView(viewName) {
+            currentActiveView = viewName;
+            ['categories', 'wallet', 'benefits'].forEach(v => {
+                const sec = document.getElementById(`view-${v}`);
+                const btn = document.getElementById(`nav-btn-${v}`);
+                if (v === viewName) {
+                    sec.classList.remove('hidden');
+                    btn.className = "flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl transition text-indigo-400 bg-indigo-500/15 font-semibold";
+                } else {
+                    sec.classList.add('hidden');
+                    btn.className = "flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl transition text-slate-400 hover:text-slate-200 font-medium";
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        function populateDropdown() {
+            const dropdown = document.getElementById('card-select-dropdown');
+            dropdown.innerHTML = '<option value="" disabled selected>Select a credit card...</option>';
+            
+            // Sort database cards alphabetically in the dropdown
+            const sortedDb = [...creditCardDatabase].sort((a, b) => a.name.localeCompare(b.name));
+
+            sortedDb.forEach(card => {
+                const inWallet = userWallet.includes(card.id);
+                if (!inWallet) {
+                    const opt = document.createElement('option');
+                    opt.value = card.id;
+                    opt.textContent = card.name;
+                    dropdown.appendChild(opt);
+                }
+            });
+        }
+
+        function addSelectedCard() {
+            const dropdown = document.getElementById('card-select-dropdown');
+            const cardId = dropdown.value;
+            if (!cardId) return;
+            if (!userWallet.includes(cardId)) {
+                userWallet.push(cardId);
+                saveState();
+                populateDropdown();
+                renderAll();
+                dropdown.value = "";
+            }
+        }
+
+        function removeCard(cardId) {
+            userWallet = userWallet.filter(id => id !== cardId);
+            saveState();
+            populateDropdown();
+            renderAll();
+        }
+
+        // Multiplier Numeric Parser for Sorting descending
+        function parseMultiplierVal(rateStr) {
+            if (!rateStr) return 0;
+            const match = rateStr.match(/(\d+(\.\d+)?)/);
+            return match ? parseFloat(match[1]) : 0;
+        }
+
+        // Distinct Badge Color mapping ensuring every multiplier tier has a completely unique color tone
+        function getMultiplierBadgeStyle(val) {
+            if (val >= 10) return 'bg-fuchsia-500/20 border-fuchsia-500/50 text-fuchsia-300 shadow-sm shadow-fuchsia-500/20';
+            if (val >= 6) return 'bg-purple-500/20 border-purple-500/50 text-purple-300';
+            if (val >= 5) return 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 shadow-sm shadow-emerald-500/20';
+            if (val >= 4) return 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-sm shadow-amber-500/20';
+            if (val >= 3) return 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300';
+            if (val >= 2) return 'bg-blue-500/20 border-blue-500/50 text-blue-300';
+            if (val > 1) return 'bg-indigo-500/20 border-indigo-500/50 text-indigo-300';
+            return 'bg-slate-700/60 border-slate-600/60 text-slate-400';
+        }
+
+        // Render All Views
+        function renderAll() {
+            renderHeaderSummary();
+            renderWalletView();
+            renderCategoriesView();
+            renderBenefitsView();
+            lucide.createIcons();
+        }
+
+        function renderHeaderSummary() {
+            const count = userWallet.length;
+            document.getElementById('wallet-summary-subtitle').textContent = `${count} active card${count === 1 ? '' : 's'} in wallet`;
+            document.getElementById('active-card-count').textContent = `${count} active`;
+            document.getElementById('wallet-card-badge').textContent = `${count} active`;
+        }
+
+        // Render Wallet View List (Alphabetically Sorted)
+        function renderWalletView() {
+            const container = document.getElementById('wallet-cards-list');
+            if (userWallet.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-8 text-center space-y-3">
+                        <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                            <i data-lucide="wallet" class="w-6 h-6"></i>
+                        </div>
+                        <p class="text-sm font-medium text-slate-300">Your wallet is currently empty</p>
+                        <p class="text-xs text-slate-500">Select cards from the dropdown above to populate your active wallet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort wallet cards alphabetically by card name
+            const sortedWalletCardObjects = userWallet.map(cardId => creditCardDatabase.find(c => c.id === cardId)).filter(Boolean);
+            sortedWalletCardObjects.sort((a, b) => a.name.localeCompare(b.name));
+
+            container.innerHTML = sortedWalletCardObjects.map(card => {
+                return `
+                    <div class="bg-gradient-to-r ${card.color} p-4 rounded-2xl border border-slate-700/80 shadow-xl flex items-center justify-between group transition hover:scale-[1.01]">
+                        <div class="flex items-center space-x-3.5">
+                            <div class="bg-white/10 backdrop-blur-md p-2.5 rounded-xl border border-white/10 text-white">
+                                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">${card.name}</h4>
+                                <p class="text-xs text-slate-300">${card.issuer} • ${card.benefits.length} active benefits</p>
+                            </div>
+                        </div>
+                        <button onclick="removeCard('${card.id}')" class="p-2 rounded-xl bg-black/30 hover:bg-red-500/20 text-slate-300 hover:text-red-400 transition border border-white/10" title="Remove Card">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Categories View (Highest to Lowest Multiplier with distinct colored badges)
+        function renderCategoriesView() {
+            const container = document.getElementById('categories-container');
+            if (userWallet.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-8 text-center space-y-3">
+                        <p class="text-sm font-medium text-slate-300">No cards in your wallet</p>
+                        <p class="text-xs text-slate-500">Add cards in the Wallet tab to calculate optimized multipliers.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = categoryConfig.map(cat => {
+                let multipliersList = [];
+                userWallet.forEach(cardId => {
+                    const card = creditCardDatabase.find(c => c.id === cardId);
+                    if (card && card.multipliers[cat.key]) {
+                        const m = card.multipliers[cat.key];
+                        multipliersList.push({
+                            cardName: card.name,
+                            issuer: card.issuer,
+                            rate: m.rate,
+                            desc: m.desc,
+                            numericVal: parseMultiplierVal(m.rate)
+                        });
+                    }
+                });
+
+                // Sort descending by multiplier value
+                multipliersList.sort((a, b) => b.numericVal - a.numericVal);
+
+                if (multipliersList.length === 0) return '';
+
+                return `
+                    <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+                        <div class="flex items-center space-x-2 pb-1 border-b border-slate-700/60">
+                            <div class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400">
+                                <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
+                            </div>
+                            <h3 class="font-bold text-sm text-white">${cat.name}</h3>
+                        </div>
+                        <div class="space-y-2 pt-1">
+                            ${multipliersList.map((item, idx) => {
+                                const badgeStyle = getMultiplierBadgeStyle(item.numericVal);
+                                return `
+                                    <div class="flex items-center justify-between bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                                        <div class="flex items-center space-x-3 pr-2">
+                                            <span class="text-xs font-bold text-slate-500 w-4">#${idx + 1}</span>
+                                            <div>
+                                                <span class="text-xs font-bold text-white block">${item.cardName}</span>
+                                                <span class="text-[11px] text-slate-400 block leading-tight">${item.desc}</span>
+                                            </div>
+                                        </div>
+                                        <div class="border px-2.5 py-1 rounded-lg text-xs font-extrabold whitespace-nowrap ${badgeStyle}">
+                                            ${item.rate}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Benefits View
+        function setBenefitFilter(freq) {
+            currentBenefitFilter = freq;
+            ['all', 'Monthly', 'Quarterly', 'Annual'].forEach(f => {
+                const btn = document.getElementById(`filter-btn-${f}`);
+                if (f === freq) {
+                    btn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition shadow-sm";
+                } else {
+                    btn.className = "flex-1 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition";
+                }
+            });
+            renderBenefitsView();
+        }
+
+        function toggleBenefitCheck(benefitId) {
+            checkedBenefits[benefitId] = !checkedBenefits[benefitId];
+            saveState();
+            renderBenefitsView();
+        }
+
+        function resetAllBenefits() {
+            checkedBenefits = {};
+            saveState();
+            renderBenefitsView();
+        }
+
+        function renderBenefitsView() {
+            const container = document.getElementById('benefits-container');
+            let allBenefits = [];
+
+            userWallet.forEach(cardId => {
+                const card = creditCardDatabase.find(c => c.id === cardId);
+                if (card && card.benefits) {
+                    card.benefits.forEach(b => {
+                        allBenefits.push({
+                            ...b,
+                            cardName: card.name,
+                            cardIssuer: card.issuer
+                        });
+                    });
+                }
+            });
+
+            // Update stats
+            const totalBenefitsCount = allBenefits.length;
+            const claimedCount = allBenefits.filter(b => checkedBenefits[b.id]).length;
+            document.getElementById('benefit-stats').textContent = `${claimedCount}/${totalBenefitsCount}`;
+
+            // Filter benefits based on active tab
+            let filteredBenefits = allBenefits;
+            if (currentBenefitFilter !== 'all') {
+                filteredBenefits = allBenefits.filter(b => b.freq === currentBenefitFilter);
+            }
+
+            // Sorting logic: Monthly first, then others; and within each group, unchecked items appear before checked items
+            filteredBenefits.sort((a, b) => {
+                const aChecked = !!checkedBenefits[a.id];
+                const bChecked = !!checkedBenefits[b.id];
+
+                // Checked items sink to bottom
+                if (aChecked !== bChecked) {
+                    return aChecked ? 1 : -1;
+                }
+
+                // Monthly comes first among same check status
+                const aIsMonthly = a.freq === 'Monthly' ? 0 : 1;
+                const bIsMonthly = b.freq === 'Monthly' ? 0 : 1;
+                if (aIsMonthly !== bIsMonthly) {
+                    return aIsMonthly - bIsMonthly;
+                }
+
+                return 0;
+            });
+
+            if (filteredBenefits.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-8 text-center space-y-3">
+                        <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                            <i data-lucide="gift" class="w-6 h-6"></i>
+                        </div>
+                        <p class="text-sm font-medium text-slate-300">No benefits found</p>
+                        <p class="text-xs text-slate-500">Your current wallet cards have no benefits matching this filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredBenefits.map(b => {
+                const isChecked = !!checkedBenefits[b.id];
+                return `
+                    <div onclick="toggleBenefitCheck('${b.id}')" class="bg-slate-800/60 backdrop-blur-xl border ${isChecked ? 'border-emerald-500/30 bg-emerald-950/10 opacity-75' : 'border-slate-700/80'} rounded-2xl p-4 shadow-xl flex items-start space-x-3.5 cursor-pointer transition hover:border-indigo-500/50">
+                        <div class="pt-0.5">
+                            <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); toggleBenefitCheck('${b.id}')" class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900 cursor-pointer">
+                        </div>
+                        <div class="flex-1 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${b.freq === 'Monthly' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : b.freq === 'Quarterly' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'}">${b.freq} Reset</span>
+                                <span class="text-xs font-bold text-slate-400">${b.cardName}</span>
+                            </div>
+                            <h4 class="font-bold text-sm ${isChecked ? 'line-through text-slate-400' : 'text-white'}">${b.name}</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">${b.desc}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
